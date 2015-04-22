@@ -15,7 +15,7 @@ var xchange_filename = 'exchange.json';
 exchange.file(xchange_filename);
 
 module.exports = {
-    getImageFromFolder : function(dir, cb){
+    getImagesFromFolder : function(dir, cb){
         var callback = cb || (function (){});
 
         getFilesFromDirectory(dir, function(files){

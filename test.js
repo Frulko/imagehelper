@@ -32,6 +32,6 @@ imageHelper.generateSprite(sprite, function(res, err){
 });
 
 
-imageHelper.getImageFromFolder('images', function(files){
+imageHelper.getImagesFromFolder('images', function(files){
     console.log(files);
 });
