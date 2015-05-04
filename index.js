@@ -8,10 +8,11 @@ var platform = os.platform();
 var go = platform == 'win32' || platform == 'win64' ? 'ImageHelper.exe' : 'ImageHelper';
 go = 'bin' + path.sep + platform + path.sep + go;
 
+go = path.join(__dirname, go);
 
 //console.log(platform.indexOf('win'));
 
-var xchange_filename = 'exchange.json';
+var xchange_filename = path.join(__dirname, 'exchange.json');
 exchange.file(xchange_filename);
 
 module.exports = {
@@ -74,7 +75,7 @@ function execBinary (binObject, data, cb){
     var bin = binObject || {exe : '', args : []};
 
     //console.log(bin, data);
-    console.log('binary called "%s %s" for platform "%s"', go, bin.args.join(' '), platform);
+    //console.log('binary called "%s %s" for platform "%s"', go, bin.args.join(' '), platform);
     exchange.write(data, function(){
 
         var process = spawn(bin.exe, bin.args);
@@ -91,7 +92,6 @@ function execBinary (binObject, data, cb){
 function getFilesFromDirectory (dir, cb){
     var callback = cb || (function (){});
     var files_ = files_ || [];
-    dir = path.join(process.cwd(), dir);
     fs.readdir(dir, function(err, files){
 
         if(err){
@@ -99,10 +99,17 @@ function getFilesFromDirectory (dir, cb){
             return;
         }
 
-        files_ = files.map(function(file){
-            if(file[0] !== '.'){
-                return path.join(dir, file);
+        files_ = files.filter(function(file){
+            if(file != '.DS_Store' && file != '.' && file != '..'){
+                var filepath = path.join(dir, file);
+                var stats = fs.statSync(filepath);
+                if(stats.isFile()){
+                    return filepath;
+                }
             }
+        }).map(function(file){
+            var filepath = path.join(dir, file);
+            return filepath;
         });
 
         callback(files_);
@@ -118,11 +125,6 @@ function handleImagesInformations (images_data, cb){
             res = res.filter(function(item){
                 return item.validate;
             });
-
-            res.forEach(function(item){
-                // console.log('%s - %spx - %spx', item.filename, item.width, item.height);
-            });
-            // console.log('Number of files : %s | Images : %s ', res.length, cpt);
             callback(res);
         });
     }else{
